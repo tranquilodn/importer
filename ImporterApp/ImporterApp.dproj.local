@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/08/28 18:53:37.000.321,=D:\Delphi\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/08/28 18:54:18.000.210,D:\Delphi\Projects\Unit1.dfm=D:\Delphi\Projects\Importer\ImporterApp\MainFormU.dfm</Transaction>
+    <Transaction>2018/08/28 18:54:18.000.210,D:\Delphi\Projects\Unit1.pas=D:\Delphi\Projects\Importer\ImporterApp\MainFormU.pas</Transaction>
+    <Transaction>2018/08/28 18:54:24.000.333,D:\Delphi\Projects\Project1.dproj=D:\Delphi\Projects\Importer\ImporterApp\ImporterApp.dproj</Transaction>
+    <Transaction>2018/08/28 18:59:06.000.999,=D:\Delphi\Projects\Importer\ImporterApp\Unit1.pas</Transaction>
+    <Transaction>2018/08/28 18:59:48.000.475,D:\Delphi\Projects\Importer\ImporterApp\Unit1.pas=D:\Delphi\Projects\Importer\ImporterFramework\ImporterFrameworkU.pas</Transaction>
+    <Transaction>2018/09/06 19:35:57.000.141,=D:\Delphi\Projects\Importer\importerframework\UtilsU.pas</Transaction>
+    <Transaction>2018/09/07 22:22:59.000.172,D:\Delphi\Projects\Importer\importerframework\UtilsU.pas=</Transaction>
+  </Transactions>
+</BorlandProject>

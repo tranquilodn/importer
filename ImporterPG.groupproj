@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{38958CAC-A445-48A2-A420-162B08683A99}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ImporterApp\ImporterApp.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ImporterTest\ImporterTest.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ImporterApp">
+        <MSBuild Projects="ImporterApp\ImporterApp.dproj"/>
+    </Target>
+    <Target Name="ImporterApp:Clean">
+        <MSBuild Projects="ImporterApp\ImporterApp.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImporterApp:Make">
+        <MSBuild Projects="ImporterApp\ImporterApp.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ImporterTest">
+        <MSBuild Projects="ImporterTest\ImporterTest.dproj"/>
+    </Target>
+    <Target Name="ImporterTest:Clean">
+        <MSBuild Projects="ImporterTest\ImporterTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ImporterTest:Make">
+        <MSBuild Projects="ImporterTest\ImporterTest.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ImporterApp;ImporterTest"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ImporterApp:Clean;ImporterTest:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ImporterApp:Make;ImporterTest:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

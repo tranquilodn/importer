@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<TgConfig Version="3" SubLevelDisabled="False">
+  <Option Name="namespaceFolder.ImporterFrameworkTest" Type="System.String" Value="ImporterFrameworkTest" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.ImporterFrameworkU" Type="System.String" Value="ImporterFrameworkU" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.ImporterTest" Type="System.String" Value="ImporterTest" Category="General" IsBrowsable="False" />
+  <Option Name="namespaceFolder.UtilsU" Type="System.String" Value="UtilsU" Category="General" IsBrowsable="False" />
+</TgConfig>

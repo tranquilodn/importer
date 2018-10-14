@@ -1,0 +1,7 @@
+FIELD_NAME,DATA_TYPE,ACCEPT_EMPTY,VALIDATE_LENGTH,MAX_LENGTH,DESTINATION_FIELD_NAME;
+Make,String,FALSE,True,,;
+Model,String,FALSE,True,25,;
+Base Price,Currency,,False,,;
+Introduced,DateTime,False,False,,;
+Cylinders,Integer,False,False,,;
+Convertible,Boolean,False,False,,;

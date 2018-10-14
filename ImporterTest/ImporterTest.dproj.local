@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2018/08/28 18:56:23.000.905,=D:\Delphi\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/08/28 18:56:49.000.247,D:\Delphi\Projects\Importer\ImporterTest\ImporterFrameworkTestU.pas=D:\Delphi\Projects\Unit1.pas</Transaction>
+    <Transaction>2018/08/28 18:56:57.000.570,D:\Delphi\Projects\Importer\ImporterTest\ImporterTest.dproj=D:\Delphi\Projects\Project1.dproj</Transaction>
+    <Transaction>2018/08/30 22:37:21.000.780,=D:\Delphi\Projects\Importer\ImporterFramework\ImporterFrameworkU.pas</Transaction>
+    <Transaction>2018/08/30 22:39:48.000.912,=D:\Delphi\Projects\Importer\ImporterTest\Unit1.pas</Transaction>
+    <Transaction>2018/08/30 22:40:03.000.755,D:\Delphi\Projects\Importer\ImporterTest\Unit1.pas=D:\Delphi\Projects\Importer\ImporterTest\ImporterFrameworkTest.ValidatorU.pas</Transaction>
+    <Transaction>2018/09/01 12:04:38.000.294,D:\Delphi\Projects\Importer\ImporterTest\ImporterFrameworkTestU.pas=</Transaction>
+    <Transaction>2018/09/01 12:04:44.000.535,D:\Delphi\Projects\Importer\ImporterTest\ImporterFrameworkTest.pas=D:\Delphi\Projects\Importer\ImporterTest\ImporterFrameworkTest.ValidatorU.pas</Transaction>
+    <Transaction>2018/09/05 19:22:45.000.887,=D:\Delphi\Projects\Importer\ImporterTest\Unit1.pas</Transaction>
+    <Transaction>2018/09/05 19:23:07.000.254,D:\Delphi\Projects\Importer\ImporterFramework\UtilsU.pas=D:\Delphi\Projects\Importer\ImporterTest\Unit1.pas</Transaction>
+    <Transaction>2018/09/05 21:01:55.000.995,=D:\Delphi\Projects\Importer\ImporterTest\ModelSupport_ImporterTest\default.txaPackage</Transaction>
+    <Transaction>2018/09/05 21:01:59.000.601,=D:\Delphi\Projects\Importer\ImporterTest\ModelSupport_ImporterTest\default.txvpck</Transaction>
+    <Transaction>2018/09/05 21:02:01.000.908,=D:\Delphi\Projects\Importer\ImporterTest\ModelSupport_ImporterTest\ImporterFrameworkTest\default.txvpck</Transaction>
+    <Transaction>2018/09/05 21:02:02.000.054,=D:\Delphi\Projects\Importer\ImporterTest\ModelSupport_ImporterTest\ImporterTest\default.txvpck</Transaction>
+    <Transaction>2018/09/05 21:02:05.000.092,=D:\Delphi\Projects\Importer\ImporterTest\ModelSupport_ImporterTest\ImporterFrameworkU\default.txvpck</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,11 @@
+FIELD_NAME,DATA_TYPE,ACCEPT_EMPTY,VALIDATE_LENGTH,MAX_LENGTH,DESTINATION_FIELD;
+Make,String,FALSE,True,50,;
+Model,String,FALSE,True,60,;
+Base Price,Currency,True,False,,BasePrice;
+Cylinders,Integer,True,False,,;
+Power,Integer,True,False,,;
+Fuel,  String, True,True,20,;
+Weight,Numeric,True,False,,;
+Introduced,DateTime,True,False,,;
+Convertible,Boolean,True,False,,IsConvertible;
+
