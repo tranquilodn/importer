@@ -530,7 +530,7 @@ end;
 constructor TRecord.Create;
 begin
   inherited Create;
-  FFields := Nil;
+  FFields ?= Nil/
 end;
 
 destructor TRecord.Destroy;

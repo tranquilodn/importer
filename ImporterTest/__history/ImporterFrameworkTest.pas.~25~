@@ -8,9 +8,9 @@ uses
 
 const
   CSVFileDefinitionInvalid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
-  CSVFileDefinitionValid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
-  CSVSourceFileValid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileValid.csv';
-  CSVSourceFileInvalid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileInvalid.csv';
+  CSVFileDefinitionValid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
+  CSVSourceFileValid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileValid.csv';
+  CSVSourceFileInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileInvalid.csv';
 
 type
   [TestFixture('TValidationRuleTest')]
@@ -731,9 +731,14 @@ end;
 procedure TCSVSourceFileTest.CreateTest;
 var
   CSVSourceFile: TCSVSourceFile;
+  AuxLocalMethod: TTestLocalMethod;
 begin
-  CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
-  CSVSourceFile.Prepare;
+  AuxLocalMethod := procedure
+  begin
+    CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
+    CSVSourceFile.Prepare;
+  end;
+  Assert.WillRaise(AuxLocalMethod, EFileNotFoundException);
   CSVSourceFile.Destroy;
 end;
 

@@ -7,8 +7,8 @@ uses
   ImporterFrameworkU;
 
 const
-  CSVFileDefinitionInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
-  CSVFileDefinitionValid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
+  CSVFileDefinitionInvalid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
+  CSVFileDefinitionValid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
   CSVSourceFileValid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileValid.csv';
   CSVSourceFileInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileInvalid.csv';
 
@@ -247,8 +247,16 @@ type
     procedure AddFieldTest;
 
     [Test]
+    [WillRaise(ENullPointerException)]
+    procedure AddFieldTest_ENullPointerException;
+
+    [Test]
     [WillRaise(EFieldNameMustBeUniqueException)]
-    procedure AddFieldTest_EFieldNameMustBeUniqueException;
+    procedure AddFieldTest_SameName_EFieldNameMustBeUniqueException;
+
+    [Test]
+    [WillRaise(EFieldNameMustBeUniqueException)]
+    procedure AddFieldTest_SameName_DifferentUpperLowerCase_EFieldNameMustBeUniqueException;
 
     [Setup]
     procedure Setup;
@@ -298,11 +306,8 @@ begin
 end;
 
 procedure TFieldTest.FieldNameTest_EEmptyFieldNameException;
-var
-  Method: TTestLocalMethod;
 begin
-  Method := procedure begin Field.Name := ''; end;
-  Assert.WillRaise(Method, EEmptyFieldNameException);
+  Field.Name := '';
 end;
 
 procedure TFieldTest.FieldValueTest(const AValue: Variant);
@@ -403,23 +408,44 @@ begin
   AuxRecord.Destroy;
 end;
 
-procedure TRecordTest.AddFieldTest_EFieldNameMustBeUniqueException;
+procedure TRecordTest.AddFieldTest_ENullPointerException;
 var
   AuxRecord: TRecord;
   AuxField: TField;
-  AuxMethod: TTestLocalMethod;
+begin
+  AuxField := Nil;
+  AuxRecord := TRecord.Create;
+  AuxRecord.AddField(AuxField);
+end;
+
+procedure TRecordTest.AddFieldTest_SameName_DifferentUpperLowerCase_EFieldNameMustBeUniqueException;
+var
+  AuxRecord: TRecord;
+  AuxField: TField;
 begin
   AuxRecord := TRecord.Create;
-  AuxMethod := procedure
-  begin
-    AuxField := TField.Create;
-    AuxField.Name := 'FieldName';
-    AuxRecord.AddField(AuxField);
-    AuxField := TField.Create;
-    AuxField.Name := 'FieldName';
-    AuxRecord.AddField(AuxField);
-  end;
-  Assert.WillRaise(AuxMethod, EFieldNameMustBeUniqueException);
+  AuxField := TField.Create;
+  AuxField.Name := 'FieldName';
+  AuxRecord.AddField(AuxField);
+  AuxField := TField.Create;
+  AuxField.Name := 'fieldNamE';
+  AuxRecord.AddField(AuxField);
+  AuxField.Free;
+  AuxRecord.Destroy;
+end;
+
+procedure TRecordTest.AddFieldTest_SameName_EFieldNameMustBeUniqueException;
+var
+  AuxRecord: TRecord;
+  AuxField: TField;
+begin
+  AuxRecord := TRecord.Create;
+  AuxField := TField.Create;
+  AuxField.Name := 'FieldName';
+  AuxRecord.AddField(AuxField);
+  AuxField := TField.Create;
+  AuxField.Name := 'FieldName';
+  AuxRecord.AddField(AuxField);
   AuxField.Free;
   AuxRecord.Destroy;
 end;

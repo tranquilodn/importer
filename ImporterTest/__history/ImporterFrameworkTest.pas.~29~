@@ -731,9 +731,14 @@ end;
 procedure TCSVSourceFileTest.CreateTest;
 var
   CSVSourceFile: TCSVSourceFile;
+  //AuxLocalMethod: TTestLocalMethod;
 begin
-  CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
-  CSVSourceFile.Prepare;
+  //AuxLocalMethod := procedure
+  //begin
+    CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
+    CSVSourceFile.Prepare;
+  //end;
+  //Assert.WillRaise(AuxLocalMethod, EFileNotFoundException);
   CSVSourceFile.Destroy;
 end;
 

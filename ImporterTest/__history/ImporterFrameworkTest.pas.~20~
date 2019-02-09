@@ -7,10 +7,10 @@ uses
   ImporterFrameworkU;
 
 const
-  CSVFileDefinitionInvalid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
-  CSVFileDefinitionValid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
-  CSVSourceFileValid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileValid.csv';
-  CSVSourceFileInvalid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileInvalid.csv';
+  CSVFileDefinitionInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
+  CSVFileDefinitionValid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
+  CSVSourceFileValid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileValid.csv';
+  CSVSourceFileInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileInvalid.csv';
 
 type
   [TestFixture('TValidationRuleTest')]
@@ -408,16 +408,6 @@ begin
   AuxRecord.Destroy;
 end;
 
-procedure TRecordTest.AddFieldTest_ENullPointerException;
-var
-  AuxRecord: TRecord;
-  AuxField: TField;
-begin
-  AuxField := Nil;
-  AuxRecord := TRecord.Create;
-  AuxRecord.AddField(AuxField);
-end;
-
 procedure TRecordTest.AddFieldTest_SameName_DifferentUpperLowerCase_EFieldNameMustBeUniqueException;
 var
   AuxRecord: TRecord;
@@ -731,9 +721,14 @@ end;
 procedure TCSVSourceFileTest.CreateTest;
 var
   CSVSourceFile: TCSVSourceFile;
+  AuxLocalMethod: TTestLocalMethod;
 begin
-  CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
-  CSVSourceFile.Prepare;
+  AuxLocalMethod := procedure
+  begin
+    CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
+    CSVSourceFile.Prepare;
+  end;
+  Assert.WillRaise(AuxLocalMethod, EFileNotFoundException);
   CSVSourceFile.Destroy;
 end;
 

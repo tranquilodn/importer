@@ -530,7 +530,6 @@ end;
 constructor TRecord.Create;
 begin
   inherited Create;
-  FFields := Nil;
 end;
 
 destructor TRecord.Destroy;
@@ -571,11 +570,11 @@ var
 begin
   Result := False;
   for Index := 0 to FFields.Count - 1 do
-  begin
-    Result := UpperCase(Trim(TField(FFields[Index]).Name)) = UpperCase(Trim(AFieldName));
-    if Result then
+    Result := Trim(TField(FFields[Index]).Name) = Trim(AFieldName);
+    begin
+      Result := True;
       Break;
-  end;
+    end;
 end;
 
 { TValidationRule }
