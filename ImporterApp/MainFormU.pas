@@ -8,9 +8,8 @@ uses
   Vcl.ExtCtrls, Vcl.Buttons, ImporterFrameworkU, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
-  FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, System.UITypes,
-  FireDAC.Comp.ScriptCommands, FireDAC.Stan.Util, FireDAC.Comp.Script,
-  FireDAC.Comp.Client, Vcl.ComCtrls;
+  FireDAC.VCLUI.Wait, System.UITypes, FireDAC.Comp.ScriptCommands,
+  FireDAC.Stan.Util, FireDAC.Comp.Script, FireDAC.Comp.Client, Vcl.ComCtrls;
 
 type
   TImportProcess = class(TThread)

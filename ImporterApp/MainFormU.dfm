@@ -145,7 +145,6 @@ object MainForm: TMainForm
       'DATABASE=TestDB'
       'MARS=yes'
       'DriverID=MSSQL')
-    Connected = True
     LoginPrompt = False
     Transaction = dbTransaction
     Left = 632

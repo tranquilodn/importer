@@ -1,0 +1,764 @@
+unit ImporterFrameworkTest;
+
+interface
+
+uses
+  DUnitX.TestFramework, System.SysUtils,
+  ImporterFrameworkU;
+
+const
+  CSVFileDefinitionInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
+  CSVFileDefinitionValid = 'D:\Delphi\Projects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
+  CSVSourceFileValid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileValid.csv';
+  CSVSourceFileInvalid = 'D:\Delphi\Projects\Importer\SampleFiles\SourceFileInvalid.csv';
+
+type
+  [TestFixture('TValidationRuleTest')]
+  TValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TValidationRule;
+  public
+
+    [Test]
+    [TestCase('Case001_AcceptEmptyTest_True_Pass', 'True,True,True')]
+    [TestCase('Case002_AcceptEmptyTest_False_Pass', 'False,False,True')]
+    [TestCase('Case003_AcceptEmptyTest_True_Fail', 'True,False,False')]
+    [TestCase('Case004_AcceptEmptyTest_False_Fail', 'False,True,False')]
+    procedure AcceptEmptyTest(const AAcceptEmpty: Boolean; const AExpectedResult: Boolean; const ATestWillPass: Boolean);
+
+    [Test]
+    [TestCase('Case005_ValidateLengthTest_True_Pass', 'True,True,True')]
+    [TestCase('Case006_ValidateLengthTest_False_Pass', 'False,False,True')]
+    [TestCase('Case007_ValidateLengthTest_True_Fail', 'True,False,False')]
+    [TestCase('Case008_ValidateLengthTest_False_Fail', 'False,True,False')]
+    procedure ValidateLengthTest(const AValidateLength: Boolean; const AExpectedResult: Boolean; const ATestWillPass: Boolean);
+
+    [Test]
+    [TestCase('Case009_MaxLengthTest_Pass', '12,12,True')]
+    [TestCase('Case010_MaxLengthTest_Fail', '12,11,False')]
+    procedure MaxLengthTest(const AMaxLength: Integer; const AExpectedResult: Integer; const ATestWillPass: Boolean);
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+
+  [TestFixture('TStringValidationRuleTest')]
+  TStringValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TStringValidationRule;
+  public
+    [Test]
+    [TestCase('Case011_AcceptEmpty_EmptyString','True,,True,')]
+    [TestCase('Case012_AcceptEmpty_NotEmptyString_Valid','True,StringToValidate,True,')]
+    [TestCase('Case013_DoNotAcceptEmpty_EmptyString','False,,False,Field must have a value')]
+    [TestCase('Case014_DoNotAcceptEmpty_NotEmptyString','False,StringToValidate,True,')]
+    procedure ParseTest(
+      const AAcceptEmpty: Boolean;
+      const AValue: Variant;
+      const AExpectedResult: Boolean;
+      const AExpectedMessage: String);
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyString_InvalidString;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyString_InvalidString;
+
+    [Test]
+    procedure ParseTest_ValidateLength_ValidLength;
+
+    [Test]
+    procedure ParseTest_ValidateLength_InvalidLength;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+type
+  [TestFixture('TCurrencyValidationRuleTest')]
+  TCurrencyValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TCurrencyValidationRule;
+  public
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidCurrencyValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidCurrencyValue;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+type
+  [TestFixture('TIntegerValidationRuleTest')]
+  TIntegerValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TIntegerValidationRule;
+  public
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+type
+  [TestFixture('TDateTimeValidationRuleTest')]
+  TDateTimeValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TDateTimeValidationRule;
+  public
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+  [TestFixture('TBooleanValidationRuleTest')]
+  TBooleanValidationRuleTest = class(TObject)
+  private
+    FValidationRule: TBooleanValidationRule;
+  public
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_EmptyValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+
+    [Test]
+    procedure ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+type
+  [TestFixture('TFieldTest')]
+  TFieldTest = class(TObject)
+  private
+    Field: TField;
+  public
+
+    [Test]
+    procedure CreateTest;
+
+    [Test]
+    [WillRaise(EEmptyFieldNameException)]
+    [TestCase('Constructor with Empty FieldName', ',String')]
+    procedure CreateTest_EEmptyFieldNameException(const AName: String; const ADataType: String);
+
+    [Test]
+    [TestCase('FieldName Testing', 'FieldName')]
+    procedure FieldNameTest(AName: String);
+
+    [Test]
+    [WillRaise(EEmptyFieldNameException)]
+    procedure FieldNameTest_EEmptyFieldNameException;
+
+    [Test]
+    [TestCase('String Value', 'String Value to the Field')]
+    [TestCase('Integer Value', '325.55')]
+    [TestCase('Integer Value', '1250')]
+    [TestCase('DateTime Value', '28/11/1973')]
+    [TestCase('Boolean Value', 'True')]
+    procedure FieldValueTest(const AValue: Variant);
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+  [TestFixture('TRecordTest')]
+  TRecordTest = class(TObject)
+  public
+
+    [Test]
+    procedure AddFieldTest;
+
+    [Test]
+    [WillRaise(EFieldNameMustBeUniqueException)]
+    procedure AddFieldTest_EFieldNameMustBeUniqueException;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+  [TestFixture('TCSVSourceFileTest')]
+  TCSVSourceFileTest = class(TObject)
+  public
+
+    [Test]
+    [WillRaise(EFileNotFoundException)]
+    procedure CreateTest;
+
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+  end;
+
+implementation
+
+procedure TFieldTest.CreateTest;
+var
+  AuxField: TField;
+begin
+  AuxField := TField.Create;
+  Assert.IsTrue(AuxField <> Nil);
+  AuxField.Free;
+end;
+
+procedure TFieldTest.CreateTest_EEmptyFieldNameException(const AName: String; const ADataType: String);
+var
+  LocalMethod: TTestLocalMethod;
+  AuxField: TField;
+begin
+  LocalMethod := procedure begin AuxField := TField.Create(AName, ADataType); end;
+  Assert.WillRaise(LocalMethod, EEmptyFieldNameException);
+  AuxField.Free;
+end;
+
+procedure TFieldTest.FieldNameTest(AName: String);
+begin
+  Field.Name := AName;
+  Assert.AreEqual(AName, Field.Name);
+end;
+
+procedure TFieldTest.FieldNameTest_EEmptyFieldNameException;
+var
+  Method: TTestLocalMethod;
+begin
+  Method := procedure begin Field.Name := ''; end;
+  Assert.WillRaise(Method, EEmptyFieldNameException);
+end;
+
+procedure TFieldTest.FieldValueTest(const AValue: Variant);
+begin
+  Field.Value := AValue;
+  Assert.AreEqual(AValue, Field.Value);
+end;
+
+procedure TFieldTest.Setup;
+begin
+  Field := TField.Create('FieldName', TDataType.dtString);
+end;
+
+procedure TFieldTest.TearDown;
+begin
+  Field.Free;
+end;
+
+{ TStringValidationRuleTest }
+
+procedure TStringValidationRuleTest.ParseTest(const AAcceptEmpty: Boolean;
+  const AValue: Variant; const AExpectedResult: Boolean;
+  const AExpectedMessage: String);
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := AAcceptEmpty;
+  Assert.AreEqual(AExpectedResult, FValidationRule.Parse(AValue, AuxReasonForRejection));
+  Assert.AreEqual(AExpectedMessage, AuxReasonForRejection);
+end;
+
+procedure TStringValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyString_InvalidString;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsFalse(FValidationRule.Parse(1234, AuxReasonForRejection));
+  Assert.AreEqual(TStringValidationRule.INVALID_STRING_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TStringValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyString_InvalidString;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse(443311, AuxReasonForRejection));
+  Assert.AreEqual(TStringValidationRule.INVALID_STRING_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TStringValidationRuleTest.ParseTest_ValidateLength_InvalidLength;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  FValidationRule.ValidateLength := True;
+  FValidationRule.MaxLength := 14;
+  Assert.IsFalse(FValidationRule.Parse('string to parse', AuxReasonForRejection));
+  Assert.AreEqual(TStringValidationRule.INVALID_LENGTH_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TStringValidationRuleTest.ParseTest_ValidateLength_ValidLength;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  FValidationRule.ValidateLength := True;
+  FValidationRule.MaxLength := 15;
+  Assert.IsTrue(FValidationRule.Parse('string to parse', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TStringValidationRuleTest.Setup;
+begin
+  FValidationRule := TStringValidationRule.Create;
+end;
+
+procedure TStringValidationRuleTest.TearDown;
+begin
+  if FValidationRule <> Nil then
+    FValidationRule.Destroy;
+end;
+
+{ TRecordTest }
+
+procedure TRecordTest.AddFieldTest;
+var
+  AuxRecord: TRecord;
+  AuxField: TField;
+begin
+  AuxRecord := TRecord.Create;
+  AuxField := TField.Create;
+  AuxField.Name := 'FieldName1';
+  AuxRecord.AddField(AuxField);
+  AuxField := TField.Create;
+  AuxField.Name := 'FieldName2';
+  AuxRecord.AddField(AuxField);
+  Assert.AreEqual(2, AuxRecord.Fields.Count);
+  AuxRecord.Destroy;
+end;
+
+procedure TRecordTest.AddFieldTest_EFieldNameMustBeUniqueException;
+var
+  AuxRecord: TRecord;
+  AuxField: TField;
+  AuxMethod: TTestLocalMethod;
+begin
+  AuxRecord := TRecord.Create;
+  AuxMethod := procedure
+  begin
+    AuxField := TField.Create;
+    AuxField.Name := 'FieldName';
+    AuxRecord.AddField(AuxField);
+    AuxField := TField.Create;
+    AuxField.Name := 'FieldName';
+    AuxRecord.AddField(AuxField);
+  end;
+  Assert.WillRaise(AuxMethod, EFieldNameMustBeUniqueException);
+  AuxField.Free;
+  AuxRecord.Destroy;
+end;
+
+procedure TRecordTest.Setup;
+begin
+end;
+
+procedure TRecordTest.TearDown;
+begin
+end;
+
+{ TCurrencyValidationRuleTest }
+
+procedure TCurrencyValidationRuleTest.ParseTest_AcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('22123.21', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsFalse(FValidationRule.Parse('Invalid value', AuxReasonForRejection));
+  Assert.AreEqual(TCurrencyValidationRule.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual(TCurrencyValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidCurrencyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('string to be invalid', AuxReasonForRejection));
+  Assert.AreEqual(TCurrencyValidationRule.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidCurrencyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsTrue(FValidationRule.Parse('12321.31', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TCurrencyValidationRuleTest.Setup;
+begin
+  FValidationRule := TCurrencyValidationRule.Create;
+end;
+
+procedure TCurrencyValidationRuleTest.TearDown;
+begin
+  if FValidationRule <> Nil then
+    FValidationRule.Destroy;
+end;
+
+{ TIntegerValidationRuleTest }
+
+procedure TIntegerValidationRuleTest.ParseTest_AcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsFalse(FValidationRule.Parse('invalid integer value', AuxReasonForRejection));
+  Assert.AreEqual(TIntegerValidationRule.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('23234', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.ParseTest_DoNotAcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual(TIntegerValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('invalid integer', AuxReasonForRejection));
+  Assert.AreEqual(TIntegerValidationRule.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsTrue(FValidationRule.Parse('2018', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TIntegerValidationRuleTest.Setup;
+begin
+  FValidationRule := TIntegerValidationRule.Create;
+end;
+
+procedure TIntegerValidationRuleTest.TearDown;
+begin
+  if FValidationRule <> Nil then
+    FValidationRule.Destroy;
+end;
+
+{ TDateTimeValidationRuleTest }
+
+procedure TDateTimeValidationRuleTest.ParseTest_AcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsFalse(FValidationRule.Parse('Invalid value', AuxReasonForRejection));
+  Assert.AreEqual(TDateTimeValidationRule.INVALID_DATETIME_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('28/11/1973', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.ParseTest_DoNotAcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual(TDateTimeValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('invalid value', AuxReasonForRejection));
+  Assert.AreEqual(TDateTimeValidationRule.INVALID_DATETIME_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsTrue(FValidationRule.Parse('15/11/2005', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TDateTimeValidationRuleTest.Setup;
+begin
+  FValidationRule := TDateTimeValidationRule.Create;
+end;
+
+procedure TDateTimeValidationRuleTest.TearDown;
+begin
+  if FValidationRule <> Nil then
+    FValidationRule.Destroy;
+end;
+
+{ TBooleanValidationRuleTest }
+
+procedure TBooleanValidationRuleTest.ParseTest_AcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsFalse(FValidationRule.Parse('invalid', AuxReasonForRejection));
+  Assert.AreEqual(TBooleanValidationRule.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := True;
+  Assert.IsTrue(FValidationRule.Parse('True', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.ParseTest_DoNotAcceptEmpty_EmptyValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
+  Assert.AreEqual(TBooleanValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsFalse(FValidationRule.Parse('invalid', AuxReasonForRejection));
+  Assert.AreEqual(TBooleanValidationRule.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
+var
+  AuxReasonForRejection: String;
+begin
+  FValidationRule.AcceptEmpty := False;
+  Assert.IsTrue(FValidationRule.Parse('False', AuxReasonForRejection));
+  Assert.AreEqual('', AuxReasonForRejection);
+end;
+
+procedure TBooleanValidationRuleTest.Setup;
+begin
+  FValidationRule := TBooleanValidationRule.Create;
+end;
+
+procedure TBooleanValidationRuleTest.TearDown;
+begin
+  if FValidationRule <> Nil then
+    FValidationRule.Destroy;
+end;
+
+{ TCSVSourceFileTest }
+
+procedure TCSVSourceFileTest.CreateTest;
+var
+  CSVSourceFile: TCSVSourceFile;
+  AuxLocalMethod: TTestLocalMethod;
+begin
+  AuxLocalMethod := procedure
+  begin
+    CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
+    CSVSourceFile.Prepare;
+  end;
+  Assert.WillRaise(AuxLocalMethod, EFileNotFoundException);
+  CSVSourceFile.Destroy;
+end;
+
+procedure TCSVSourceFileTest.Setup;
+begin
+end;
+
+procedure TCSVSourceFileTest.TearDown;
+begin
+end;
+
+{ TValidationRuleTest }
+
+procedure TValidationRuleTest.AcceptEmptyTest(const AAcceptEmpty,
+  AExpectedResult, ATestWillPass: Boolean);
+begin
+  FValidationRule.AcceptEmpty := AAcceptEmpty;
+  Assert.IsTrue(ATestWillPass = (AExpectedResult = FValidationRule.AcceptEmpty));
+end;
+
+procedure TValidationRuleTest.MaxLengthTest(const AMaxLength,
+  AExpectedResult: Integer; const ATestWillPass: Boolean);
+begin
+  FValidationRule.MaxLength := AMaxLength;
+  Assert.IsTrue(ATestWillPass = (AExpectedResult = FValidationRule.MaxLength));
+end;
+
+procedure TValidationRuleTest.Setup;
+begin
+  FValidationRule := TValidationRule.Create;
+end;
+
+procedure TValidationRuleTest.TearDown;
+begin
+  FValidationRule.Destroy;
+end;
+
+procedure TValidationRuleTest.ValidateLengthTest(const AValidateLength,
+  AExpectedResult, ATestWillPass: Boolean);
+begin
+  FValidationRule.ValidateLength := AValidateLength;
+  Assert.IsTrue(ATestWillPass = (AExpectedResult = FValidationRule.ValidateLength));
+end;
+
+initialization
+  //Not needed due the [TestFixture('TStringValidationRuleTest')]
+  //and so no.
+  //TDUnitX.RegisterTestFixture(TStringValidationRuleTest);
+end.
