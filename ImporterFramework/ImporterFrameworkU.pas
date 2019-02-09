@@ -3,9 +3,9 @@ unit ImporterFrameworkU;
 interface
 
 uses
-  System.SysUtils, System.UITypes, System.Classes, System.Variants, System.Generics.Collections,
-  Data.DB, FireDAC.Comp.Client, FireDAC.Comp.Script, Vcl.ComCtrls,
-  Vcl.Dialogs;
+  System.SysUtils, System.UITypes, System.Classes, System.Variants,
+  System.Generics.Collections, Data.DB, FireDAC.Comp.Client,
+  FireDAC.Comp.Script, Vcl.ComCtrls, Vcl.Dialogs;
 
 type
   EImporterFrameworkException = class(Exception);
@@ -15,14 +15,17 @@ type
   const
     EMPTY_FIELD_NAME_MESSAGE = 'Field must have a name';
   end;
+
   EFieldNameMustBeUniqueException = class(EImporterFrameworkException)
   const
     FIELD_NAME_MUST_BE_UNIQUE_MESSAGE = 'Field Name must be unique';
   end;
+
   EIncompatibleValidationRuleException = class(EImporterFrameworkException)
   const
     INCOMPATIBLE_VALIDATION_RULE_MESSAGE = 'Validation Rule is incompatible';
   end;
+
   ENullPointerException = class(EImporterFrameworkException)
   const
     NULL_POINTER_EXCEPTION_MESSAGE = 'Null Pointer Exception';
