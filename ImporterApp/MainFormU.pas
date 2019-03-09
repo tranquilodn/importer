@@ -9,7 +9,8 @@ uses
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, System.UITypes, FireDAC.Comp.ScriptCommands,
-  FireDAC.Stan.Util, FireDAC.Comp.Script, FireDAC.Comp.Client, Vcl.ComCtrls;
+  FireDAC.Stan.Util, FireDAC.Comp.Script, FireDAC.Comp.Client, Vcl.ComCtrls,
+  FireDAC.Phys.PG, FireDAC.Phys.PGDef;
 
 type
   TImportProcess = class(TThread)
@@ -36,6 +37,7 @@ type
     pbImportFile: TProgressBar;
     lImporting: TLabel;
     chkHasHeader: TCheckBox;
+    fdPhysPG: TFDPhysPgDriverLink;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure bSelectFileClick(Sender: TObject);
     procedure bExecuteClick(Sender: TObject);
@@ -208,14 +210,14 @@ end;
 
 procedure TMainForm.ValidateProcess;
 begin
+  dbConnection.Connected := True;
   if not IsReady then
     Exit;
   FSourceFile := TCSVSourceFile.Create(eFileDefinition.Text);
   FSourceFile.FileName := eFileName.Text;
   FSourceFile.HasHeader := chkHasHeader.Checked;
   FDestination := TDatabaseDestination.Create(fdScript, 'TestTable');
-  ImportEngine := TImportEngine.Create(FSourceFile, FDestination, pbImportFile);
-  //ImportEngine := TImportEngine.Create(FSourceFile, FDestination);
+  ImportEngine := TImportEngine.Create(FSourceFile, FDestination);
   try
     ImportEngine.Prepare;
     UpdateUserInterface;

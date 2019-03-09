@@ -137,14 +137,11 @@ object MainForm: TMainForm
   end
   object dbConnection: TFDConnection
     Params.Strings = (
-      'SERVER=TRANQUILODN-LT\MSSQL2017'
-      'User_Name=sa'
-      'Password=sql'
-      'ApplicationName=CSVImporter'
-      'Workstation=TRANQUILODN-LT'
-      'DATABASE=TestDB'
-      'MARS=yes'
-      'DriverID=MSSQL')
+      'User_Name=postgres'
+      'Password=pgsql'
+      'Database=TestDB'
+      'Server=localhost'
+      'DriverID=PGSQL')
     LoginPrompt = False
     Transaction = dbTransaction
     Left = 632
@@ -163,5 +160,11 @@ object MainForm: TMainForm
     Macros = <>
     Left = 632
     Top = 120
+  end
+  object fdPhysPG: TFDPhysPgDriverLink
+    DriverID = 'PGSQL'
+    VendorLib = 'C:\Program Files (x86)\PostgreSQL\10\bin\libpq.dll'
+    Left = 632
+    Top = 168
   end
 end

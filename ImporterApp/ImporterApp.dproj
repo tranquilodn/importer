@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{D5981C6A-F171-4310-8165-4FB081051BB4}</ProjectGuid>
-        <ProjectVersion>18.5</ProjectVersion>
+        <ProjectVersion>18.6</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>ImporterApp.dpr</MainSource>
         <Base>True</Base>
@@ -93,7 +93,6 @@
         </DelphiCompile>
         <DCCReference Include="MainFormU.pas">
             <Form>MainForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\ImporterFramework\ImporterFrameworkU.pas"/>
         <BuildConfiguration Include="Release">

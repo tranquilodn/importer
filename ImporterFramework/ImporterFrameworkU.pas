@@ -3,14 +3,14 @@ unit ImporterFrameworkU;
 interface
 
 uses
-  System.SysUtils, System.UITypes, System.Classes, System.Variants,
-  System.Generics.Collections, Data.DB, FireDAC.Comp.Client,
-  FireDAC.Comp.Script, Vcl.ComCtrls, Vcl.Dialogs;
+  System.SysUtils, System.Classes, System.Variants, System.Generics.Collections,
+  Data.DB, FireDAC.Comp.Client, FireDAC.Comp.Script;
 
 type
   EImporterFrameworkException = class(Exception);
 
   EValueNotAcceptedException = class(EImporterFrameworkException);
+
   EEmptyFieldNameException = class(EImporterFrameworkException)
   const
     EMPTY_FIELD_NAME_MESSAGE = 'Field must have a name';
@@ -31,7 +31,7 @@ type
     NULL_POINTER_EXCEPTION_MESSAGE = 'Null Pointer Exception';
   end;
 
-  TDataType = class
+  TDataType = record
   const
     dtString = 'String';
     dtCurrency = 'Currency';
@@ -41,7 +41,7 @@ type
     dtBoolean = 'Boolean';
   end;
 
-  TValidationRule = class(TObject)
+  TValidationRule = class
   const
     FIELD_EMPTY_MESSAGE = 'Field must have a value';
   private
@@ -143,7 +143,7 @@ type
     function GetValue: Boolean;
   end;
 
-  TField = class(TObject)
+  TField = class
   private
     FFieldName: String;
     FFieldIsValid: Boolean;
@@ -166,10 +166,6 @@ type
     constructor Create(const AFieldName: String; const ADataType: String); overload;
     destructor Destroy; override;
     function Parse(var AReasonForRejection: String): Boolean;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: TField); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: String); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: Integer); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: Boolean); overload;
     property Name: String read FFieldName write SetFieldName;
     property DestinationField: String read FDestinationField write SetDestinationField;
     property IsValid: Boolean read FFieldIsValid write SetFieldIsValid;
@@ -177,11 +173,13 @@ type
     property AcceptEmpty: Boolean read GetAcceptEmpty write SetAcceptEmpty;
     property MaxLength: Integer read GetMaxLength write SetMaxLength;
     property ValidateLength: Boolean read GetValidateLength write SetValidateLength;
+    class procedure ParseValue(const ASourceField: TField; var ATarget: TField); overload;
+    class procedure ParseValue(const ASourceField: TField; var ATarget: String); overload;
+    class procedure ParseValue(const ASourceField: TField; var ATarget: Integer); overload;
+    class procedure ParseValue(const ASourceField: TField; var ATarget: Boolean); overload;
   end;
 
-  TBaseRecord = class(TObject);
-
-  TRecord = class(TBaseRecord)
+  TRecord = class
   private
     FFields: TList<TField>;
     function FieldNameAlreadyExists(const AFieldName: String): Boolean;
@@ -193,7 +191,7 @@ type
     property Fields: TList<TField> read FFields;
   end;
 
-  TFileDefinitionFieldNames = class
+  TFileDefinitionFieldNames = record
   const
     FD_FIELD_NAME = 'FIELD_NAME';
     FD_DATA_TYPE = 'DATA_TYPE';
@@ -203,7 +201,7 @@ type
     FD_DESTINATION_FIELD = 'DESTINATION_FIELD';
   end;
 
-  TFileDefinition = class(TObject)
+  TFileDefinition = class
   private
     FRecord: TRecord;
     FFile: TStringList;
@@ -245,7 +243,7 @@ type
     property TextDelimiter: Char read FTextDelimiter write SetTextDelimiter;
   end;
 
-  TDestination = class(TObject)
+  TDestination = class
   private
     FSQLAssembly: TStringBuilder;
     FRejectedRecords: TStringList;
@@ -280,9 +278,9 @@ type
     property TableName: String read FTableName write SetTableName;
   end;
 
-  TSource = class(TObject)
+  TSource = class
     function Prepare: Boolean; virtual; abstract;
-    function ExecuteProcess(const ADestination: TDestination; var AProgressBar: TProgressBar): Boolean; virtual; abstract;
+    procedure ExecuteProcess(const ADestination: TDestination); virtual; abstract;
   end;
 
   TSourceFile = class(TSource)
@@ -295,7 +293,9 @@ type
     destructor Destroy; override;
     function SplitRecord(const ARecord: String; var ARecordContent: TArray<String>;
       const ADelimiter: Char; const AFieldDelimiter: Char; const ATextDelimiter: Char): Boolean; virtual; abstract;
-    function ValidateRecord(const ARecord: TArray<String>; var AReasonForRejection: String): Boolean; virtual; abstract;
+    function ValidateRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean;  overload; virtual; abstract;
+    function ValidateRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>;
+      var AReasonForRejection: String): Boolean;  overload; virtual; abstract;
     function ParseRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; overload; virtual; abstract;
     function ParseRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; overload; virtual; abstract;
     property FileName: String read FFileName write SetFileName;
@@ -307,10 +307,8 @@ type
     FFileStructure: TRecord;
     FHasHeader: Boolean;
     function ValidateFileDefinition(var AReasonForRejection: String): Boolean;
-    function ProcessFileWithHeader(const ADestination: TDestination;
-      var AProgressBar: TProgressBar): Boolean;
-    function ProcessFileWithoutHeader(const ADestination: TDestination;
-      var AProgressBar: TProgressBar): Boolean;
+    function ProcessFileWithHeader(const ADestination: TDestination): Boolean;
+    function ProcessFileWithoutHeader(const ADestination: TDestination): Boolean;
     procedure SetHasHeader(const Value: Boolean);
     function GetFieldDelimiter: Char;
     function GetRecordDelimiter: Char;
@@ -323,13 +321,13 @@ type
     destructor Destroy; override;
     function SplitRecord(const ARecord: String; var ARecordContent: TArray<String>;
       const ADelimiter: Char; const AFieldDelimiter: Char; const ATextDelimiter: Char): Boolean; override;
-    function ValidateRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; overload;
+    function ValidateRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; override;
     function ValidateRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>;
-      var AReasonForRejection: String): Boolean; overload;
+      var AReasonForRejection: String): Boolean; override;
     function ParseRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; override;
     function ParseRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; override;
     function Prepare: Boolean; override;
-    function ExecuteProcess(const ADestination: TDestination; var AProgressBar: TProgressBar): Boolean; override;
+    procedure ExecuteProcess(const ADestination: TDestination); override;
     property HasHeader: Boolean read FHasHeader write SetHasHeader;
     property RecordDelimiter: Char read GetRecordDelimiter write SetRecordDelimiter;
     property FieldDelimiter: Char read GetFieldDelimiter write SetFieldDelimiter;
@@ -342,20 +340,16 @@ type
     destructor Destroy; override;
   end;
 
-  TImportEngine = class(TObject)
+  TImportEngine = class
   private
-    FProgress: TProgressBar;
     FCSVSource: TCSVSourceFile;
     FDestination: TDestination;
     FPrepared: Boolean;
     procedure SetSource(const ASource: TCSVSourceFile);
     procedure SetDestination(const ADestination: TDestination);
     procedure SetPrepared(const Value: Boolean);
-    procedure SetProgressBar(const AProgressBar: TProgressBar);
   public
-    constructor Create(const ASource: TCSVSourceFile; const ADestination: TDestination); overload;
-    constructor Create(const ASource: TCSVSourceFile; const ADestination: TDestination;
-      var AProgressBar: TProgressBar); overload;
+    constructor Create(const ASource: TCSVSourceFile; const ADestination: TDestination);
     destructor Destroy; override;
     procedure Prepare;
     procedure Reset;
@@ -887,13 +881,12 @@ begin
   inherited;
 end;
 
-function TCSVSourceFile.ExecuteProcess(const ADestination: TDestination;
-  var AProgressBar: TProgressBar): Boolean;
+procedure TCSVSourceFile.ExecuteProcess(const ADestination: TDestination);
 begin
   if HasHeader then
-    Result := ProcessFileWithHeader(ADestination, AProgressBar)
+    ProcessFileWithHeader(ADestination)
   else
-    Result := ProcessFileWithoutHeader(ADestination, AProgressBar);
+    ProcessFileWithoutHeader(ADestination);
   ADestination.SaveRejectedRecordsToDisk(FileName);
 end;
 
@@ -926,8 +919,7 @@ begin
      raise Exception.Create('Invalid File Definition structure'+#13#10+AuxReasonForRejection);
 end;
 
-function TCSVSourceFile.ProcessFileWithHeader(const ADestination: TDestination;
-  var AProgressBar: TProgressBar): Boolean;
+function TCSVSourceFile.ProcessFileWithHeader(const ADestination: TDestination): Boolean;
 var
   FileIndex: Integer;
   RecordIndex: Integer;
@@ -939,8 +931,6 @@ begin
   Result := True;
   for FileIndex := 0 to FFile.Count -1 do
   begin
-    if AProgressBar <> Nil then
-      AProgressBar.Max := FFile.Count -1;
     Result := SplitRecord(FFile[FileIndex], AuxRecord, FFileDefinition.RecordDelimiter,
       FFileDefinition.FieldDelimiter, FFileDefinition.TextDelimiter);
     if Result then
@@ -968,13 +958,10 @@ begin
           ADestination.SetRejectecRecord(AuxRecord[RecordIndex], AuxReasonForRejection);
       end;
     end;
-    if AProgressBar <> Nil then
-      AProgressBar.Position := FileIndex;
   end;
 end;
 
-function TCSVSourceFile.ProcessFileWithoutHeader(const ADestination: TDestination;
-  var AProgressBar: TProgressBar): Boolean;
+function TCSVSourceFile.ProcessFileWithoutHeader(const ADestination: TDestination): Boolean;
 var
   FileIndex: Integer;
   RecordIndex: Integer;
@@ -984,8 +971,6 @@ var
 begin
   for FileIndex := 0 to FFile.Count -1 do
   begin
-    if AProgressBar <> Nil then
-      AProgressBar.Max := FFile.Count -1;
     Result := SplitRecord(FFile[FileIndex], AuxRecord, FFileDefinition.RecordDelimiter,
       FFileDefinition.FieldDelimiter, FFileDefinition.TextDelimiter);
     if Result then
@@ -1005,8 +990,6 @@ begin
           ADestination.SetRejectecRecord(AuxRecord[RecordIndex], AuxReasonForRejection);
       end;
     end;
-    if AProgressBar <> Nil then
-      AProgressBar.Position := FileIndex;
   end;
   Result := True;
 end;
@@ -1090,15 +1073,6 @@ end;
 
 { TImportEngine }
 
-constructor TImportEngine.Create(const ASource: TCSVSourceFile; const ADestination: TDestination;
-  var AProgressBar: TProgressBar);
-begin
-  inherited Create;
-  SetSource(ASource);
-  SetDestination(ADestination);
-  SetProgressBar(AProgressBar);
-end;
-
 constructor TImportEngine.Create(const ASource: TCSVSourceFile;
   const ADestination: TDestination);
 begin
@@ -1117,21 +1091,11 @@ begin
   if not FPrepared then
     Prepare;
   if FPrepared then
-  begin
-    if FCSVSource.ExecuteProcess(FDestination, FProgress) then
-    begin
-      MessageDlg('Finish importing!', mtInformation, [mbOk], 0);
-    end;
-  end;
+    FCSVSource.ExecuteProcess(FDestination);
 end;
 
 procedure TImportEngine.Prepare;
 begin
-  if FProgress <> Nil then
-  begin
-    FProgress.Min := 0;
-    FProgress.Position := 0;
-  end;
   FPrepared := FCSVSource.Prepare;
   if FPrepared then
     FPrepared := FDestination.Prepare;
@@ -1152,12 +1116,6 @@ end;
 procedure TImportEngine.SetPrepared(const Value: Boolean);
 begin
   FPrepared := Value;
-end;
-
-procedure TImportEngine.SetProgressBar(const AProgressBar: TProgressBar);
-begin
-  if AProgressBar <> Nil then
-    FProgress := AProgressBar;
 end;
 
 procedure TImportEngine.SetSource(const ASource: TCSVSourceFile);
