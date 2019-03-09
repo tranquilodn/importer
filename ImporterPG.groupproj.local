@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>2018/08/28 18:54:33.000.173,D:\Delphi\Projects\Importer\ImporterPG.groupproj=D:\Delphi\Projects\ProjectGroup1.groupproj</Transaction>
-  </Transactions>
-	<Default.Personality>
-		<Projects ActiveProject="D:\DelphiProjects\Importer\ImporterTest\ImporterTest.dproj"/>
-	</Default.Personality>
-</BorlandProject>
