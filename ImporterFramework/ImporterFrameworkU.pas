@@ -55,10 +55,10 @@ type
     function FieldIsEmpty(const AValue: String): Boolean; overload;
     function FieldIsEmpty(const AValue: String; var AReasonForRejection: String): Boolean; overload;
     function IsValidateLength(const AValue: String; var AReasonForRejection: String): Boolean;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; virtual;
     property AcceptEmpty: Boolean read FAcceptEmpty write SetAcceptEmpty;
     property MaxLength: Integer read FMaxLength write SetMaxLength;
     property ValidateLength: Boolean read FValidateLength write SetValidateLength;
@@ -137,7 +137,6 @@ type
     FValue: Boolean;
     function IsBoolean(const AValue: Variant; var AReasonForRejection: String): Boolean;
   public
-    constructor Create;
     destructor Destroy; override;
     function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
     function GetValue: Boolean;
@@ -625,6 +624,13 @@ begin
     AReasonForRejection := TStringValidationRule.INVALID_LENGTH_MESSAGE;
 end;
 
+function TValidationRule.Parse(const AValue: Variant;
+  var AReasonForRejection: String): Boolean;
+begin
+  AReasonForRejection := '';
+  Result := True;
+end;
+
 function TStringValidationRule.Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
 begin
   AReasonForRejection := '';
@@ -765,11 +771,6 @@ begin
 end;
 
 { TBooleanValidationRule }
-
-constructor TBooleanValidationRule.Create;
-begin
-  inherited;
-end;
 
 destructor TBooleanValidationRule.Destroy;
 begin
