@@ -3,7 +3,8 @@ program ImporterApp;
 uses
   Vcl.Forms,
   MainFormU in 'MainFormU.pas' {MainForm},
-  ImporterFrameworkU in '..\ImporterFramework\ImporterFrameworkU.pas';
+  ImporterFrameworkU in '..\ImporterFramework\ImporterFrameworkU.pas',
+  Importer.Framework.Interfaces in '..\ImporterFramework\Importer.Framework.Interfaces.pas';
 
 {$R *.res}
 
