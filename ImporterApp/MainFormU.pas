@@ -210,7 +210,7 @@ end;
 
 procedure TMainForm.ValidateProcess;
 begin
-  dbConnection.Connected := True;
+  //dbConnection.Connected := True;
   if not IsReady then
     Exit;
   FSourceFile := TCSVSourceFile.Create(eFileDefinition.Text);

@@ -12,7 +12,8 @@ uses
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
   ImporterFrameworkU in '..\ImporterFramework\ImporterFrameworkU.pas',
-  ImporterFrameworkTest in 'ImporterFrameworkTest.pas';
+  ImporterFrameworkTest in 'ImporterFrameworkTest.pas',
+  Importer.Framework.Interfaces in '..\ImporterFramework\Importer.Framework.Interfaces.pas';
 
 var
   runner : ITestRunner;

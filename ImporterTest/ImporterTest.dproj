@@ -82,6 +82,7 @@
         </DelphiCompile>
         <DCCReference Include="..\ImporterFramework\ImporterFrameworkU.pas"/>
         <DCCReference Include="ImporterFrameworkTest.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Interfaces.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

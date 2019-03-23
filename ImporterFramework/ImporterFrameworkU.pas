@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.Variants, System.Generics.Collections,
-  Data.DB, FireDAC.Comp.Client, FireDAC.Comp.Script;
+  Data.DB, FireDAC.Comp.Client, FireDAC.Comp.Script,
+  Importer.Framework.Interfaces;
 
 type
   EImporterFrameworkException = class(Exception);
@@ -41,30 +42,34 @@ type
     dtBoolean = 'Boolean';
   end;
 
-  TValidationRule = class
+  TValidationRule = class(TInterfacedObject)
   const
     FIELD_EMPTY_MESSAGE = 'Field must have a value';
   private
     FAcceptEmpty: Boolean;
     FMaxLength: Integer;
     FValidateLength: Boolean;
-    procedure SetAcceptEmpty(const Value: Boolean);
-    procedure SetMaxLength(const Value: Integer);
-    procedure SetValidateLength(const Value: Boolean);
+    function Parse(const AValue: Variant;
+      var AReasonForRejection: String): Boolean;
   protected
+    function GetAcceptEmpty: Boolean;
+    procedure SetAcceptEmpty(const Value: Boolean);
+    function GetMaxLength: Integer;
+    procedure SetMaxLength(const Value: Integer);
+    function GetValidateLength: Boolean;
+    procedure SetValidateLength(const Value: Boolean);
     function FieldIsEmpty(const AValue: String): Boolean; overload;
     function FieldIsEmpty(const AValue: String; var AReasonForRejection: String): Boolean; overload;
     function IsValidateLength(const AValue: String; var AReasonForRejection: String): Boolean;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
-    property AcceptEmpty: Boolean read FAcceptEmpty write SetAcceptEmpty;
-    property MaxLength: Integer read FMaxLength write SetMaxLength;
-    property ValidateLength: Boolean read FValidateLength write SetValidateLength;
+    property AcceptEmpty: Boolean read GetAcceptEmpty write SetAcceptEmpty;
+    property MaxLength: Integer read GetMaxLength write SetMaxLength;
+    property ValidateLength: Boolean read GetValidateLength write SetValidateLength;
   end;
 
-  TStringValidationRule = class(TValidationRule)
+  TStringValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_STRING_MESSAGE = 'Invalid string';
     INVALID_LENGTH_MESSAGE = 'Invalid field length';
@@ -74,11 +79,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: String;
   end;
 
-  TCurrencyValidationRule = class(TValidationRule)
+  TCurrencyValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_CURRENCY_MESSAGE = 'Invalid currency value';
   private
@@ -87,11 +92,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: Currency;
   end;
 
-  TNumericValidationRule = class(TValidationRule)
+  TNumericValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_NUMERIC_MESSAGE = 'Invalid numeric value';
   private
@@ -100,11 +105,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: Double;
   end;
 
-  TIntegerValidationRule = class(TValidationRule)
+  TIntegerValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_INTEGER_MESSAGE = 'Invalid integer value';
   private
@@ -113,11 +118,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: Integer;
   end;
 
-  TDateTimeValidationRule = class(TValidationRule)
+  TDateTimeValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_DATETIME_MESSAGE = 'Invalid date';
   private
@@ -126,69 +131,74 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: TDateTime;
   end;
 
-  TBooleanValidationRule = class(TValidationRule)
+  TBooleanValidationRule = class(TValidationRule, IValidationRule)
   const
     INVALID_BOOLEAN_MESSAGE = 'Invalid boolean';
   private
     FValue: Boolean;
     function IsBoolean(const AValue: Variant; var AReasonForRejection: String): Boolean;
   public
-    constructor Create;
     destructor Destroy; override;
-    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean; override;
+    function Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
     function GetValue: Boolean;
   end;
 
-  TField = class
+  TField = class(TInterfacedObject, IField)
   private
     FFieldName: String;
     FFieldIsValid: Boolean;
     FFieldValue: Variant;
-    FValidationRule: TValidationRule;
+    FValidationRule: IValidationRule;
     FDestinationField: String;
+
+    function GetFieldName: String;
     procedure SetFieldName(const Value: String);
-    procedure SetFieldIsValid(const Value: Boolean);
-    procedure SetValue(const Value: Variant);
-    procedure CreateValidationRule(const ADataType: String);
-    function GetAcceptEmpty: Boolean;
-    function GetMaxLength: Integer;
-    function GetValidateLength: Boolean;
-    procedure SetAcceptEmpty(const Value: Boolean);
-    procedure SetMaxLength(const Value: Integer);
-    procedure SetValidateLength(const Value: Boolean);
+    function GetDestinationField: String;
     procedure SetDestinationField(const Value: String);
-    function GetRule: TValidationRule;
+    function GetFieldIsValid: Boolean;
+    procedure SetFieldIsValid(const Value: Boolean);
+    function GetValue: Variant;
+    procedure SetValue(const Value: Variant);
+    function GetAcceptEmpty: Boolean;
+    procedure SetAcceptEmpty(const Value: Boolean);
+    function GetMaxLength: Integer;
+    procedure SetMaxLength(const Value: Integer);
+    function GetValidateLength: Boolean;
+    procedure SetValidateLength(const Value: Boolean);
+
+    function GetRule: IValidationRule;
+    procedure CreateValidationRule(const ADataType: String);
   public
     constructor Create(const AFieldName: String; const ADataType: String); overload;
     destructor Destroy; override;
     function Parse(var AReasonForRejection: String): Boolean;
-    property Name: String read FFieldName write SetFieldName;
-    property DestinationField: String read FDestinationField write SetDestinationField;
-    property IsValid: Boolean read FFieldIsValid write SetFieldIsValid;
-    property Value: Variant read FFieldValue write SetValue;
+    property Name: String read GetFieldName write SetFieldName;
+    property DestinationField: String read GetDestinationField write SetDestinationField;
+    property IsValid: Boolean read GetFieldIsValid write SetFieldIsValid;
+    property Value: Variant read GetValue write SetValue;
     property AcceptEmpty: Boolean read GetAcceptEmpty write SetAcceptEmpty;
     property MaxLength: Integer read GetMaxLength write SetMaxLength;
     property ValidateLength: Boolean read GetValidateLength write SetValidateLength;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: TField); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: String); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: Integer); overload;
-    class procedure ParseValue(const ASourceField: TField; var ATarget: Boolean); overload;
+    class procedure ParseValue(const ASourceField: IField; var ATarget: IField); overload;
+    class procedure ParseValue(const ASourceField: IField; var ATarget: String); overload;
+    class procedure ParseValue(const ASourceField: IField; var ATarget: Integer); overload;
+    class procedure ParseValue(const ASourceField: IField; var ATarget: Boolean); overload;
   end;
 
   TRecord = class
   private
-    FFields: TList<TField>;
+    FFields: TList<IField>;
     function FieldNameAlreadyExists(const AFieldName: String): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
-    function FieldByName(AFieldName: String): TField;
-    procedure AddField(AField: TField);
-    property Fields: TList<TField> read FFields;
+    function FieldByName(AFieldName: String): IField;
+    procedure AddField(AField: IField);
+    property Fields: TList<IField> read FFields;
   end;
 
   TFileDefinitionFieldNames = record
@@ -205,12 +215,12 @@ type
   private
     FRecord: TRecord;
     FFile: TStringList;
-    FFieldName: TField;
-    FFieldDataType: TField;
-    FFieldAcceptEmpty: TField;
-    FFieldMaxLength: TField;
-    FFieldValidateLength: TField;
-    FFieldDestinationFieldName: TField;
+    FFieldName: IField;
+    FFieldDataType: IField;
+    FFieldAcceptEmpty: IField;
+    FFieldMaxLength: IField;
+    FFieldValidateLength: IField;
+    FFieldDestinationFieldName: IField;
     procedure InitializeFileDefinitionStructure;
     procedure Split(const ARecord: String; var ARecordContent: TArray<String>;
       const ADelimiter: Char; const AFieldDelimiter: Char; const ATextDelimiter: Char);
@@ -266,7 +276,7 @@ type
     function PersistWithFireDACSQLScript(const AHeader: TArray<String>; const ARecord: TRecord; ASQLScript: TFDScript; var AReasonForRejection: String): Boolean; overload;
     function AssemblyScriptToPersistRecord(const ARecord: TRecord): String; overload;
     function AssemblyScriptToPersistRecord(const AHeader: TArray<String>; const ARecord: TRecord): String; overload;
-    function GetDataToAssemlySQL(const AField: TField): String;
+    function GetDataToAssemlySQL(const AField: IField): String;
     procedure SetTableName(const Value: String);
     function PersistRecord(const AHeader: TArray<String>; const ARecord: TRecord; var AReasonForRejection: String): Boolean; override;
     function PersistRecord(const ARecord: TRecord; var AReasonForRejection: String): Boolean; override;
@@ -388,8 +398,7 @@ end;
 
 destructor TField.Destroy;
 begin
-  if FValidationRule <> Nil then
-     FValidationRule.Destroy;
+
   inherited;
 end;
 
@@ -398,10 +407,10 @@ begin
   Result := FValidationRule.Parse(FFieldValue, AReasonForRejection);
 end;
 
-class procedure TField.ParseValue(const ASourceField: TField;
+class procedure TField.ParseValue(const ASourceField: IField;
   var ATarget: Integer);
 var
-  AuxRule: TValidationRule;
+  AuxRule: IValidationRule;
 begin
   AuxRule := ASourceField.GetRule;
   if (AuxRule is TIntegerValidationRule) then
@@ -410,9 +419,9 @@ begin
     ATarget := 0;
 end;
 
-class procedure TField.ParseValue(const ASourceField: TField; var ATarget: TField);
+class procedure TField.ParseValue(const ASourceField: IField; var ATarget: IField);
 var
-  AuxRule: TValidationRule;
+  AuxRule: IValidationRule;
 begin
   AuxRule := ASourceField.GetRule;
   if (AuxRule is TStringValidationRule) then
@@ -429,9 +438,9 @@ begin
     ATarget.Value := TBooleanValidationRule(AuxRule).GetValue;
 end;
 
-class procedure TField.ParseValue(const ASourceField: TField; var ATarget: String);
+class procedure TField.ParseValue(const ASourceField: IField; var ATarget: String);
 var
-  AuxRule: TValidationRule;
+  AuxRule: IValidationRule;
 begin
   AuxRule := ASourceField.GetRule;
   if (AuxRule is TStringValidationRule) then
@@ -455,12 +464,27 @@ begin
   Result := FValidationRule.AcceptEmpty;
 end;
 
+function TField.GetDestinationField: String;
+begin
+  Result := FDestinationField;
+end;
+
+function TField.GetFieldIsValid: Boolean;
+begin
+  Result := FFieldIsValid;
+end;
+
+function TField.GetFieldName: String;
+begin
+  Result := FFieldName;
+end;
+
 function TField.GetMaxLength: Integer;
 begin
   Result := FValidationRule.MaxLength;
 end;
 
-function TField.GetRule: TValidationRule;
+function TField.GetRule: IValidationRule;
 begin
   Result := FValidationRule;
 end;
@@ -468,6 +492,11 @@ end;
 function TField.GetValidateLength: Boolean;
 begin
   Result := FValidationRule.ValidateLength;
+end;
+
+function TField.GetValue: Variant;
+begin
+  Result := FFieldValue
 end;
 
 procedure TField.SetFieldIsValid(const Value: Boolean);
@@ -492,9 +521,9 @@ begin
   FValidationRule.ValidateLength := Value;
 end;
 
-class procedure TField.ParseValue(const ASourceField: TField; var ATarget: Boolean);
+class procedure TField.ParseValue(const ASourceField: IField; var ATarget: Boolean);
 var
-  AuxRule: TValidationRule;
+  AuxRule: IValidationRule;
 begin
   AuxRule := ASourceField.GetRule;
   if (AuxRule is TBooleanValidationRule) then
@@ -510,12 +539,12 @@ end;
 
 { TRecord }
 
-procedure TRecord.AddField(AField: TField);
+procedure TRecord.AddField(AField: IField);
 begin
   if AField = Nil then
     raise ENullPointerException.Create(ENullPointerException.NULL_POINTER_EXCEPTION_MESSAGE);
   if FFields = Nil then
-    FFields := TList<TField>.Create;
+    FFields := TList<IField>.Create;
   if FieldNameAlreadyExists(AField.Name) then
     raise EFieldNameMustBeUniqueException.Create(EFieldNameMustBeUniqueException.FIELD_NAME_MUST_BE_UNIQUE_MESSAGE);
   FFields.Add(AField);
@@ -528,20 +557,13 @@ begin
 end;
 
 destructor TRecord.Destroy;
-var
-  Index: Integer;
 begin
-  if FFields <> Nil then
-  begin
-    for Index := 0 to FFields.Count -1 do
-      if FFields[Index] <> Nil then
-        FFields[Index].Destroy;
+  if Assigned(FFields) then
     FFields.Free;
-  end;
   inherited;
 end;
 
-function TRecord.FieldByName(AFieldName: String): TField;
+function TRecord.FieldByName(AFieldName: String): IField;
 var
   Index: Integer;
 begin
@@ -581,7 +603,8 @@ end;
 
 procedure TValidationRule.SetAcceptEmpty(const Value: Boolean);
 begin
-  FAcceptEmpty := Value;
+  if FAcceptEmpty <> Value then
+    FAcceptEmpty := Value;
 end;
 
 constructor TValidationRule.Create;
@@ -600,6 +623,21 @@ begin
   Result := (Trim(AValue) = '');
   if Result then
     AReasonForRejection := TStringValidationRule.FIELD_EMPTY_MESSAGE;
+end;
+
+function TValidationRule.GetAcceptEmpty: Boolean;
+begin
+  Result := FAcceptEmpty;
+end;
+
+function TValidationRule.GetMaxLength: Integer;
+begin
+  Result := FMaxLength;
+end;
+
+function TValidationRule.GetValidateLength: Boolean;
+begin
+  Result := FValidateLength;
 end;
 
 constructor TStringValidationRule.Create;
@@ -625,13 +663,20 @@ begin
     AReasonForRejection := TStringValidationRule.INVALID_LENGTH_MESSAGE;
 end;
 
+function TValidationRule.Parse(const AValue: Variant;
+  var AReasonForRejection: String): Boolean;
+begin
+  AReasonForRejection := '';
+  Result := True;
+end;
+
 function TStringValidationRule.Parse(const AValue: Variant; var AReasonForRejection: String): Boolean;
 begin
   AReasonForRejection := '';
   if AcceptEmpty then
   begin
     if not FieldIsEmpty(AValue) then
-      Result := VarTypeIsString(FindVarData(AValue)^.VType, AReasonForRejection)
+      Result := VarTypeIsString(FindVarData(AValue).VType, AReasonForRejection)
     else
       Result := True;
   end
@@ -649,12 +694,14 @@ end;
 
 procedure TValidationRule.SetMaxLength(const Value: Integer);
 begin
-  FMaxLength := Value;
+  if FMaxLength <> Value then
+    FMaxLength := Value;
 end;
 
 procedure TValidationRule.SetValidateLength(const Value: Boolean);
 begin
-  FValidateLength := Value;
+  if FValidateLength <> Value then
+    FValidateLength := Value;
 end;
 
 function TStringValidationRule.VarTypeIsString(const AVarType: TVarType; var AReasonForRejection: String): Boolean;
@@ -765,11 +812,6 @@ begin
 end;
 
 { TBooleanValidationRule }
-
-constructor TBooleanValidationRule.Create;
-begin
-  inherited;
-end;
 
 destructor TBooleanValidationRule.Destroy;
 begin
@@ -1153,7 +1195,7 @@ var
   AuxStringValue: String;
   AuxIntegerValue: Integer;
   AuxBooleanValue: Boolean;
-  AuxField: TField;
+  AuxField: IField;
 begin
   TField.ParseValue(ARecord.FieldByName(TFileDefinitionFieldNames.FD_DATA_TYPE), AuxDataType);
   AuxField := TField.Create(ARecord.FieldByName(TFileDefinitionFieldNames.FD_FIELD_NAME).Value, AuxDataType);
@@ -1490,9 +1532,9 @@ begin
   inherited;
 end;
 
-function TDatabaseDestination.GetDataToAssemlySQL(const AField: TField): String;
+function TDatabaseDestination.GetDataToAssemlySQL(const AField: IField): String;
 var
-  AuxRule: TValidationRule;
+  AuxRule: IValidationRule;
 begin
   AuxRule := AField.GetRule;
   if (AuxRule is TStringValidationRule) then
