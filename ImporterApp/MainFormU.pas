@@ -5,19 +5,21 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Data.DB,
-  Vcl.ExtCtrls, Vcl.Buttons, ImporterFrameworkU, FireDAC.Stan.Intf,
+  Vcl.ExtCtrls, Vcl.Buttons, FireDAC.Stan.Intf,
   FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, System.UITypes, FireDAC.Comp.ScriptCommands,
   FireDAC.Stan.Util, FireDAC.Comp.Script, FireDAC.Comp.Client, Vcl.ComCtrls,
-  FireDAC.Phys.PG, FireDAC.Phys.PGDef;
+  FireDAC.Phys.PG, FireDAC.Phys.PGDef, Vcl.Mask,
+  Importer.Framework.Interfaces,
+  Importer.Framework.Source;
 
 type
   TImportProcess = class(TThread)
-    FImportEngine: TImportEngine;
+    FImportEngine: IImportEngine;
   public
-    constructor Create(CreateSuspended: Boolean; AImportEngine: TImportEngine);
-    destructor Destroy; override;
+    constructor Create(CreateSuspended: Boolean; AImportEngine: IImportEngine);
+
     procedure Execute; override;
   end;
 
@@ -49,8 +51,9 @@ type
   private
     { Private declarations }
     FSourceFile: TCSVSourceFile;
-    FDestination: TDatabaseDestination;
-    ImportEngine: TImportEngine;
+    FDestination: IDestination;
+    FFileDefinition: IFileDefinition;
+    ImportEngine: IImportEngine;
     InExecution: Boolean;
     procedure ResetStructure;
     procedure SelectFileDefinition;
@@ -68,6 +71,11 @@ var
   MainForm: TMainForm;
 
 implementation
+
+uses
+  Importer.Framework.Engine,
+  Importer.Framework.Destination,
+  Importer.Framework.FileDefinition;
 
 {$R *.dfm}
 
@@ -122,15 +130,13 @@ begin
     InExecution := False;
     ResetStructure;
     Application.ProcessMessages;
-    AuxThread.Destroy;
+    AuxThread.Free;
   end;
 end;
 
 procedure TMainForm.FinalizeProcess;
 begin
-  FSourceFile.Destroy;
-  FDestination.Destroy;
-  ImportEngine.Destroy;
+  FSourceFile.Free;
 end;
 
 procedure TMainForm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -213,12 +219,14 @@ begin
   //dbConnection.Connected := True;
   if not IsReady then
     Exit;
+  FFileDefinition := TFileDefinition.Create(eFileDefinition.Text);
   FSourceFile := TCSVSourceFile.Create(eFileDefinition.Text);
   FSourceFile.FileName := eFileName.Text;
   FSourceFile.HasHeader := chkHasHeader.Checked;
-  FDestination := TDatabaseDestination.Create(fdScript, 'TestTable');
+  FDestination := TDestination.Create(fdScript, 'TestTable');
   ImportEngine := TImportEngine.Create(FSourceFile, FDestination);
   try
+    ImportEngine.WithFileDefinition(FFileDefinition);
     ImportEngine.Prepare;
     UpdateUserInterface;
     Application.ProcessMessages;
@@ -226,30 +234,21 @@ begin
     on E: Exception do
     begin
       MessageDlg(E.Message, mtError, [mbOk], mrOk);
-      FSourceFile.Destroy;
-      FDestination.Destroy;
-      ImportEngine.Destroy;
+      FreeAndNil(FSourceFile);
     end;
   end;
 end;
 
 { TImportProcess }
 
-constructor TImportProcess.Create(CreateSuspended: Boolean;
-  AImportEngine: TImportEngine);
+constructor TImportProcess.Create(CreateSuspended: Boolean; AImportEngine: IImportEngine);
 begin
   inherited Create(CreateSuspended);
   FImportEngine := AImportEngine;
 end;
 
-destructor TImportProcess.Destroy;
-begin
-  inherited;
-end;
-
 procedure TImportProcess.Execute;
 begin
-  inherited;
   FImportEngine.Execute;
 end;
 

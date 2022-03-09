@@ -11,7 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  ImporterFrameworkU in '..\ImporterFramework\ImporterFrameworkU.pas',
+  Importer.Framework.Engine in '..\ImporterFramework\Importer.Framework.Engine.pas',
   ImporterFrameworkTest in 'ImporterFrameworkTest.pas',
   Importer.Framework.Interfaces in '..\ImporterFramework\Importer.Framework.Interfaces.pas';
 

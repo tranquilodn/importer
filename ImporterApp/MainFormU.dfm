@@ -12,7 +12,6 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
@@ -31,6 +30,7 @@ object MainForm: TMainForm
     LabelPosition = lpLeft
     ReadOnly = True
     TabOrder = 2
+    Text = ''
   end
   object bSelectFile: TBitBtn
     Left = 374
@@ -82,6 +82,7 @@ object MainForm: TMainForm
     LabelPosition = lpLeft
     ReadOnly = True
     TabOrder = 0
+    Text = ''
   end
   object bSelectFileDefinition: TBitBtn
     Left = 374
