@@ -52,6 +52,7 @@ type
 implementation
 
 uses
+  System.IOUtils,
   Importer.Framework.ValidationRule,
   Importer.Framework.Field,
   Importer.Framework.Row;
@@ -93,7 +94,7 @@ begin
   inherited Create;
   InitializeFileDefinitionStructure;
   FFile := TStringList.Create;
-  FFile.LoadFromFile(AFileName);
+  FFile.LoadFromFile(TPath.GetFullPath(AFileName));
   SetFieldDelimiter(',');
   SetRowDelimiter(';');
   SetTextDelimiter('"');
@@ -101,7 +102,7 @@ end;
 
 destructor TFileDefinition.Destroy;
 begin
-  if FFile <> Nil then
+  if Assigned(FFile) then
     FFile.Free;
   inherited;
 end;

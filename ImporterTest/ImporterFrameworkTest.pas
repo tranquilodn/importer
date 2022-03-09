@@ -4,13 +4,15 @@ interface
 
 uses
   DUnitX.TestFramework, System.SysUtils,
-  ImporterFrameworkU;
+  Importer.Framework.Defines,
+  Importer.Framework.Interfaces,
+  Importer.Framework.ValidationRule;
 
 const
-  CSVFileDefinitionInvalid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionInvalid.csv';
-  CSVFileDefinitionValid = 'D:\DelphiProjects\Importer\SampleFiles\CSVFileDefinitionValid.csv';
-  CSVSourceFileValid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileValid.csv';
-  CSVSourceFileInvalid = 'D:\DelphiProjects\Importer\SampleFiles\SourceFileInvalid.csv';
+  CSVFileDefinitionInvalid = 'D:\dev\tools\importer\SampleFiles\CSVFileDefinitionInvalid.csv';
+  CSVFileDefinitionValid = 'D:\dev\tools\Importer\SampleFiles\CSVFileDefinitionValid.csv';
+  CSVSourceFileValid = 'D:\dev\tools\Importer\SampleFiles\SourceFileValid.csv';
+  CSVSourceFileInvalid = 'D:\dev\tools\Importer\SampleFiles\SourceFileInvalid.csv';
 
 type
   [TestFixture('TValidationRuleTest')]
@@ -48,7 +50,7 @@ type
   [TestFixture('TStringValidationRuleTest')]
   TStringValidationRuleTest = class(TObject)
   private
-    FValidationRule: TStringValidationRule;
+    FValidationRule: IValidationRule;
   public
     [Test]
     [TestCase('Case011_AcceptEmpty_EmptyString','True,,True,')]
@@ -83,7 +85,7 @@ type
   [TestFixture('TCurrencyValidationRuleTest')]
   TCurrencyValidationRuleTest = class(TObject)
   private
-    FValidationRule: TCurrencyValidationRule;
+    FValidationRule: IValidationRule;
   public
 
     [Test]
@@ -114,7 +116,7 @@ type
   [TestFixture('TIntegerValidationRuleTest')]
   TIntegerValidationRuleTest = class(TObject)
   private
-    FValidationRule: TIntegerValidationRule;
+    FValidationRule: IValidationRule;
   public
 
     [Test]
@@ -145,7 +147,7 @@ type
   [TestFixture('TDateTimeValidationRuleTest')]
   TDateTimeValidationRuleTest = class(TObject)
   private
-    FValidationRule: TDateTimeValidationRule;
+    FValidationRule: IValidationRule;
   public
 
     [Test]
@@ -175,7 +177,7 @@ type
   [TestFixture('TBooleanValidationRuleTest')]
   TBooleanValidationRuleTest = class(TObject)
   private
-    FValidationRule: TBooleanValidationRule;
+    FValidationRule: IValidationRule;
   public
 
     [Test]
@@ -206,7 +208,7 @@ type
   [TestFixture('TFieldTest')]
   TFieldTest = class(TObject)
   private
-    Field: TField;
+    Field: IField;
   public
 
     [Test]
@@ -280,13 +282,17 @@ type
 
 implementation
 
+uses
+  Importer.Framework.Row,
+  Importer.Framework.Source,
+  Importer.Framework.Field;
+
 procedure TFieldTest.CreateTest;
 var
-  AuxField: TField;
+  AuxField: IField;
 begin
   AuxField := TField.Create;
   Assert.IsTrue(AuxField <> Nil);
-  AuxField.Free;
 end;
 
 procedure TFieldTest.CreateTest_EEmptyFieldNameException(const AName: String; const ADataType: String);
@@ -323,7 +329,6 @@ end;
 
 procedure TFieldTest.TearDown;
 begin
-  Field.Free;
 end;
 
 { TStringValidationRuleTest }
@@ -345,7 +350,7 @@ var
 begin
   FValidationRule.AcceptEmpty := True;
   Assert.IsFalse(FValidationRule.Parse(1234, AuxReasonForRejection));
-  Assert.AreEqual(TStringValidationRule.INVALID_STRING_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_STRING_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TStringValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyString_InvalidString;
@@ -354,7 +359,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse(443311, AuxReasonForRejection));
-  Assert.AreEqual(TStringValidationRule.INVALID_STRING_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_STRING_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TStringValidationRuleTest.ParseTest_ValidateLength_InvalidLength;
@@ -365,7 +370,7 @@ begin
   FValidationRule.ValidateLength := True;
   FValidationRule.MaxLength := 14;
   Assert.IsFalse(FValidationRule.Parse('string to parse', AuxReasonForRejection));
-  Assert.AreEqual(TStringValidationRule.INVALID_LENGTH_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_LENGTH_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TStringValidationRuleTest.ParseTest_ValidateLength_ValidLength;
@@ -386,18 +391,16 @@ end;
 
 procedure TStringValidationRuleTest.TearDown;
 begin
-  if FValidationRule <> Nil then
-    FValidationRule.Destroy;
 end;
 
 { TRecordTest }
 
 procedure TRecordTest.AddFieldTest;
 var
-  AuxRecord: TRecord;
-  AuxField: TField;
+  AuxRecord: IRow;
+  AuxField: IField;
 begin
-  AuxRecord := TRecord.Create;
+  AuxRecord := TRow.Create;
   AuxField := TField.Create;
   AuxField.Name := 'FieldName1';
   AuxRecord.AddField(AuxField);
@@ -405,49 +408,43 @@ begin
   AuxField.Name := 'FieldName2';
   AuxRecord.AddField(AuxField);
   Assert.AreEqual(2, AuxRecord.Fields.Count);
-  AuxRecord.Destroy;
 end;
 
 procedure TRecordTest.AddFieldTest_ENullPointerException;
 var
-  AuxRecord: TRecord;
-  AuxField: TField;
+  AuxRecord: IRow;
+  AuxField: IField;
 begin
-  AuxField := Nil;
-  AuxRecord := TRecord.Create;
+  AuxRecord := TRow.Create;
   AuxRecord.AddField(AuxField);
 end;
 
 procedure TRecordTest.AddFieldTest_SameName_DifferentUpperLowerCase_EFieldNameMustBeUniqueException;
 var
-  AuxRecord: TRecord;
-  AuxField: TField;
+  AuxRecord: IRow;
+  AuxField: IField;
 begin
-  AuxRecord := TRecord.Create;
+  AuxRecord := TRow.Create;
   AuxField := TField.Create;
   AuxField.Name := 'FieldName';
   AuxRecord.AddField(AuxField);
   AuxField := TField.Create;
   AuxField.Name := 'fieldNamE';
   AuxRecord.AddField(AuxField);
-  AuxField.Free;
-  AuxRecord.Destroy;
 end;
 
 procedure TRecordTest.AddFieldTest_SameName_EFieldNameMustBeUniqueException;
 var
-  AuxRecord: TRecord;
-  AuxField: TField;
+  AuxRecord: IRow;
+  AuxField: IField;
 begin
-  AuxRecord := TRecord.Create;
+  AuxRecord := TRow.Create;
   AuxField := TField.Create;
   AuxField.Name := 'FieldName';
   AuxRecord.AddField(AuxField);
   AuxField := TField.Create;
   AuxField.Name := 'FieldName';
   AuxRecord.AddField(AuxField);
-  AuxField.Free;
-  AuxRecord.Destroy;
 end;
 
 procedure TRecordTest.Setup;
@@ -484,7 +481,7 @@ var
 begin
   FValidationRule.AcceptEmpty := True;
   Assert.IsFalse(FValidationRule.Parse('Invalid value', AuxReasonForRejection));
-  Assert.AreEqual(TCurrencyValidationRule.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_EmptyValue;
@@ -493,7 +490,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
-  Assert.AreEqual(TCurrencyValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidCurrencyValue;
@@ -502,7 +499,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('string to be invalid', AuxReasonForRejection));
-  Assert.AreEqual(TCurrencyValidationRule.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_CURRENCY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TCurrencyValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidCurrencyValue;
@@ -521,8 +518,6 @@ end;
 
 procedure TCurrencyValidationRuleTest.TearDown;
 begin
-  if FValidationRule <> Nil then
-    FValidationRule.Destroy;
 end;
 
 { TIntegerValidationRuleTest }
@@ -542,7 +537,7 @@ var
 begin
   FValidationRule.AcceptEmpty := True;
   Assert.IsFalse(FValidationRule.Parse('invalid integer value', AuxReasonForRejection));
-  Assert.AreEqual(TIntegerValidationRule.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TIntegerValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
@@ -560,7 +555,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
-  Assert.AreEqual(TIntegerValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TIntegerValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
@@ -569,7 +564,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('invalid integer', AuxReasonForRejection));
-  Assert.AreEqual(TIntegerValidationRule.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_INTEGER_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TIntegerValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
@@ -588,8 +583,6 @@ end;
 
 procedure TIntegerValidationRuleTest.TearDown;
 begin
-  if FValidationRule <> Nil then
-    FValidationRule.Destroy;
 end;
 
 { TDateTimeValidationRuleTest }
@@ -627,7 +620,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
-  Assert.AreEqual(TDateTimeValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TDateTimeValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
@@ -655,8 +648,6 @@ end;
 
 procedure TDateTimeValidationRuleTest.TearDown;
 begin
-  if FValidationRule <> Nil then
-    FValidationRule.Destroy;
 end;
 
 { TBooleanValidationRuleTest }
@@ -676,7 +667,7 @@ var
 begin
   FValidationRule.AcceptEmpty := True;
   Assert.IsFalse(FValidationRule.Parse('invalid', AuxReasonForRejection));
-  Assert.AreEqual(TBooleanValidationRule.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TBooleanValidationRuleTest.ParseTest_AcceptEmpty_NotEmptyValue_ValidValue;
@@ -694,7 +685,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('', AuxReasonForRejection));
-  Assert.AreEqual(TBooleanValidationRule.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.FIELD_EMPTY_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TBooleanValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_InvalidValue;
@@ -703,7 +694,7 @@ var
 begin
   FValidationRule.AcceptEmpty := False;
   Assert.IsFalse(FValidationRule.Parse('invalid', AuxReasonForRejection));
-  Assert.AreEqual(TBooleanValidationRule.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
+  Assert.AreEqual(TValidateMessage.INVALID_BOOLEAN_MESSAGE, AuxReasonForRejection);
 end;
 
 procedure TBooleanValidationRuleTest.ParseTest_DoNotAcceptEmpty_NotEmptyValue_ValidValue;
@@ -722,8 +713,6 @@ end;
 
 procedure TBooleanValidationRuleTest.TearDown;
 begin
-  if FValidationRule <> Nil then
-    FValidationRule.Destroy;
 end;
 
 { TCSVSourceFileTest }
@@ -734,7 +723,7 @@ var
 begin
   CSVSourceFile := TCSVSourceFile.Create(CSVFileDefinitionValid);
   CSVSourceFile.Prepare;
-  CSVSourceFile.Destroy;
+  CSVSourceFile.Free;
 end;
 
 procedure TCSVSourceFileTest.Setup;
@@ -768,7 +757,6 @@ end;
 
 procedure TValidationRuleTest.TearDown;
 begin
-  FValidationRule.Destroy;
 end;
 
 procedure TValidationRuleTest.ValidateLengthTest(const AValidateLength,

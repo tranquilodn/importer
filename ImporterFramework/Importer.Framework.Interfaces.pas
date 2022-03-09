@@ -85,6 +85,12 @@ type
     property TextDelimiter: Char read GetTextDelimiter write SetTextDelimiter;
   end;
 
+  ISource = interface
+    ['{D95827D5-2B42-4BFF-B8AC-9D6C2A3A5E71}']
+
+
+  end;
+
   IDestination = interface
     ['{C2B41826-654E-4C87-BD7B-8D21B0639247}']
 

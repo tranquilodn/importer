@@ -124,7 +124,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="MainFormU.pas">
+        <DCCReference Include="Form.Main.pas">
             <Form>MainForm</Form>
         </DCCReference>
         <DCCReference Include="..\ImporterFramework\Importer.Framework.Engine.pas"/>

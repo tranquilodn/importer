@@ -52,6 +52,17 @@ type
     FD_DESTINATION_FIELD = 'DESTINATION_FIELD';
   end;
 
+  TValidateMessage = class
+  const
+    FIELD_EMPTY_MESSAGE = 'Field must have a value';
+    INVALID_BOOLEAN_MESSAGE = 'Invalid boolean';
+    INVALID_INTEGER_MESSAGE = 'Invalid integer value';
+    INVALID_NUMERIC_MESSAGE = 'Invalid numeric value';
+    INVALID_STRING_MESSAGE = 'Invalid string';
+    INVALID_LENGTH_MESSAGE = 'Invalid field length';
+    INVALID_CURRENCY_MESSAGE = 'Invalid currency value';
+  end;
+
 implementation
 
 end.

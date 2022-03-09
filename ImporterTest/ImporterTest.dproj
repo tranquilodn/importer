@@ -93,9 +93,16 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\ImporterFramework\Importer.Framework.Engine.pas"/>
         <DCCReference Include="ImporterFrameworkTest.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Engine.pas"/>
         <DCCReference Include="..\ImporterFramework\Importer.Framework.Interfaces.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Defines.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.ValidationRule.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Field.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Row.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.FileDefinition.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Destination.pas"/>
+        <DCCReference Include="..\ImporterFramework\Importer.Framework.Source.pas"/>
         <None Include="ModelSupport_ImporterTest\default.txaPackage"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

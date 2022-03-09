@@ -10,8 +10,6 @@ uses
 
 type
   TValidationRule = class(TInterfacedObject)
-  const
-    FIELD_EMPTY_MESSAGE = 'Field must have a value';
   private
     FAcceptEmpty: Boolean;
     FMaxLength: Integer;
@@ -37,9 +35,6 @@ type
   end;
 
   TStringValidationRule = class(TValidationRule, IValidationRule)
-  const
-    INVALID_STRING_MESSAGE = 'Invalid string';
-    INVALID_LENGTH_MESSAGE = 'Invalid field length';
   private
     FValue: String;
     function VarTypeIsString(const AVarType: TVarType; var AReasonForRejection: String): Boolean;
@@ -51,8 +46,6 @@ type
   end;
 
   TCurrencyValidationRule = class(TValidationRule, IValidationRule)
-  const
-    INVALID_CURRENCY_MESSAGE = 'Invalid currency value';
   private
     FValue: Currency;
     function IsCurrency(const AValue: Variant; var AReasonForRejection: String): Boolean;
@@ -64,8 +57,6 @@ type
   end;
 
   TNumericValidationRule = class(TValidationRule, IValidationRule)
-  const
-    INVALID_NUMERIC_MESSAGE = 'Invalid numeric value';
   private
     FValue: Double;
     function IsNumeric(const AValue: Variant; var AReasonForRejection: String): Boolean;
@@ -77,8 +68,6 @@ type
   end;
 
   TIntegerValidationRule = class(TValidationRule, IValidationRule)
-  const
-    INVALID_INTEGER_MESSAGE = 'Invalid integer value';
   private
     FValue: Integer;
     function IsInteger(const AValue: Variant; var AReasonForRejection: String): Boolean;
@@ -103,8 +92,6 @@ type
   end;
 
   TBooleanValidationRule = class(TValidationRule, IValidationRule)
-  const
-    INVALID_BOOLEAN_MESSAGE = 'Invalid boolean';
   private
     FValue: Boolean;
     function IsBoolean(const AValue: Variant; var AReasonForRejection: String): Boolean;
@@ -144,7 +131,7 @@ function TValidationRule.FieldIsEmpty(const AValue: String;
 begin
   Result := (Trim(AValue) = '');
   if Result then
-    AReasonForRejection := TStringValidationRule.FIELD_EMPTY_MESSAGE;
+    AReasonForRejection := TValidateMessage.FIELD_EMPTY_MESSAGE;
 end;
 
 function TValidationRule.GetAcceptEmpty: Boolean;
@@ -182,7 +169,7 @@ function TValidationRule.IsValidateLength(const AValue: String;
 begin
   Result := (Length(Trim(AValue)) <= FMaxLength);
   if not Result then
-    AReasonForRejection := TStringValidationRule.INVALID_LENGTH_MESSAGE;
+    AReasonForRejection := TValidateMessage.INVALID_LENGTH_MESSAGE;
 end;
 
 function TValidationRule.Parse(const AValue: Variant;
@@ -230,7 +217,7 @@ function TStringValidationRule.VarTypeIsString(const AVarType: TVarType; var ARe
 begin
   Result := (AVarType = varOleStr) or (AVarType = varString) or (AVarType = varUString);
   if not Result then
-    AReasonForRejection := TStringValidationRule.INVALID_STRING_MESSAGE;
+    AReasonForRejection := TValidateMessage.INVALID_STRING_MESSAGE;
 end;
 
 { TIntegerValidationRule }
@@ -259,7 +246,7 @@ begin
   Val(AValue, AuxResult, AuxIsValid);
   Result := (AuxIsValid = 0);
   if not Result then
-    AReasonForRejection := Self.INVALID_INTEGER_MESSAGE
+    AReasonForRejection := TValidateMessage.INVALID_INTEGER_MESSAGE
   else
     FValue := AuxResult;
 end;
@@ -309,7 +296,7 @@ begin
   Val(AValue, AuxResult, AuxIsValid);
   Result := (AuxIsValid = 0);
   if not Result then
-    AReasonForRejection := Self.INVALID_CURRENCY_MESSAGE
+    AReasonForRejection := TValidateMessage.INVALID_CURRENCY_MESSAGE
   else
     FValue := AuxResult;
 end;
@@ -353,7 +340,7 @@ begin
     (String.UpperCase(Trim(AValue)) = 'FALSE')
   );
   if not Result then
-    AReasonForRejection := Self.INVALID_BOOLEAN_MESSAGE
+    AReasonForRejection := TValidateMessage.INVALID_BOOLEAN_MESSAGE
   else
     FValue := (UpperCase(AValue) = 'TRUE');
 end;
@@ -452,7 +439,7 @@ begin
   Val(AValue, AuxResult, AuxIsValid);
   Result := (AuxIsValid = 0);
   if not Result then
-    AReasonForRejection := Self.INVALID_NUMERIC_MESSAGE
+    AReasonForRejection := TValidateMessage.INVALID_NUMERIC_MESSAGE
   else
     FValue := AuxResult;
 end;

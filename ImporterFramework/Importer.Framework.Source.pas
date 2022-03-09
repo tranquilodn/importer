@@ -8,15 +8,22 @@ uses
   Importer.Framework.Interfaces;
 
 type
-  TSource = class
-    function Prepare: Boolean; virtual; abstract;
-    procedure ExecuteProcess(const ADestination: IDestination); virtual; abstract;
+  TSource = class(TInterfacedObject, ISource)
+  private
+    FSourceFile: TStringList;
+    FEoF: Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    function GetRow: IRow;
+    function EoF: Boolean;
   end;
 
   TSourceFile = class(TSource)
   private
     FFileName: String;
-    FFile: TStringList;
+
     FRejectedRecords: TStringList;
     procedure SetFileName(const Value: String);
   protected
@@ -25,6 +32,10 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+
+    function Prepare: Boolean; virtual; abstract;
+    procedure ExecuteProcess(const ADestination: IDestination); virtual; abstract;
+
     function SplitRow(const ARecord: String; var ARecordContent: TArray<String>;
       const ADelimiter: Char; const AFieldDelimiter: Char; const ATextDelimiter: Char): Boolean; virtual; abstract;
     function ValidateRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean;  overload; virtual; abstract;
@@ -32,6 +43,7 @@ type
       var AReasonForRejection: String): Boolean;  overload; virtual; abstract;
     function ParseRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; overload; virtual; abstract;
     function ParseRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; overload; virtual; abstract;
+
     property FileName: String read FFileName write SetFileName;
   end;
 
@@ -61,7 +73,12 @@ type
     function ParseRecord(const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; override;
     function ParseRecord(const ARecordHeader: TArray<String>; const ARecordContent: TArray<String>; var AReasonForRejection: String): Boolean; override;
     function Prepare: Boolean; override;
+
+
     procedure ExecuteProcess(const ADestination: IDestination); override;
+
+
+
     property HasHeader: Boolean read FHasHeader write SetHasHeader;
     property RecordDelimiter: Char read GeTRowDelimiter write SeTRowDelimiter;
     property FieldDelimiter: Char read GetFieldDelimiter write SetFieldDelimiter;
@@ -117,7 +134,7 @@ var
 begin
   Result := FileExists(FFileName);
   if Result then
-    FFile.LoadFromFile(FFileName)
+    FSourceFile.LoadFromFile(FFileName)
   else
     raise EFileNotFoundException.Create('A valid path and source file must be informed');
   Result := ValidateFileDefinition(AuxReasonForRejection);
@@ -135,9 +152,9 @@ var
   AuxReasonForRejection: String;
 begin
   Result := True;
-  for FileIndex := 0 to FFile.Count -1 do
+  for FileIndex := 0 to FSourceFile.Count -1 do
   begin
-    Result := SpliTRow(FFile[FileIndex], AuxRecord, FFileDefinition.RowDelimiter,
+    Result := SpliTRow(FSourceFile[FileIndex], AuxRecord, FFileDefinition.RowDelimiter,
       FFileDefinition.FieldDelimiter, FFileDefinition.TextDelimiter);
     if Result then
     begin
@@ -175,9 +192,9 @@ var
   AuxRecordContent: TArray<String>;
   AuxReasonForRejection: String;
 begin
-  for FileIndex := 0 to FFile.Count -1 do
+  for FileIndex := 0 to FSourceFile.Count -1 do
   begin
-    Result := SpliTRow(FFile[FileIndex], AuxRecord, FFileDefinition.RowDelimiter,
+    Result := SpliTRow(FSourceFile[FileIndex], AuxRecord, FFileDefinition.RowDelimiter,
       FFileDefinition.FieldDelimiter, FFileDefinition.TextDelimiter);
     if Result then
     begin
@@ -282,14 +299,12 @@ end;
 constructor TSourceFile.Create;
 begin
   inherited Create;
-  FFile := TStringList.Create;
   FRejectedRecords := TStringList.Create;
 end;
 
 destructor TSourceFile.Destroy;
 begin
   FRejectedRecords.Free;
-  FFile.Free;
   inherited Destroy;
 end;
 
@@ -306,7 +321,7 @@ end;
 procedure TSourceFile.SetFileName(const Value: String);
 begin
   FFileName := Value;
-  FFile.Clear;
+  FSourceFile.Clear;
 end;
 
 procedure TSourceFile.SetRejectecRecord(const ARecord, AReasonForRejection: String);
@@ -321,6 +336,31 @@ begin
     FRejectedRecords.Add(AuxAssemblyRejectedRecord.ToString);
     AuxAssemblyRejectedRecord.Free;
   end;
+end;
+
+{ TSource }
+
+constructor TSource.Create;
+begin
+  inherited;
+  FSourceFile := TStringList.Create;
+end;
+
+destructor TSource.Destroy;
+begin
+  FSourceFile.Free;
+  inherited;
+end;
+
+function TSource.EoF: Boolean;
+begin
+  Result := FEoF;
+end;
+
+function TSource.GetRow: IRow;
+begin
+  Result := TRow.Create;
+  FEoF := True;
 end;
 
 end.

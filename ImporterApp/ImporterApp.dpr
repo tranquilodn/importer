@@ -2,7 +2,7 @@ program ImporterApp;
 
 uses
   Vcl.Forms,
-  MainFormU in 'MainFormU.pas' {MainForm},
+  Form.Main in 'Form.Main.pas' {MainForm},
   Importer.Framework.Engine in '..\ImporterFramework\Importer.Framework.Engine.pas',
   Importer.Framework.Interfaces in '..\ImporterFramework\Importer.Framework.Interfaces.pas',
   Importer.Framework.Defines in '..\ImporterFramework\Importer.Framework.Defines.pas',

@@ -12,7 +12,7 @@ uses
 type
   TImportEngine = class(TInterfacedObject, IImportEngine)
   private
-    FCSVSource: TCSVSourceFile;
+    FSource: TCSVSourceFile;
     FDestination: IDestination;
     FValidator: IFileDefinition;
     FPrepared: Boolean;
@@ -62,7 +62,7 @@ begin
   if not FPrepared then
     Prepare;
   if FPrepared then
-    FCSVSource.ExecuteProcess(FDestination);
+    FSource.ExecuteProcess(FDestination);
 end;
 
 function TImportEngine.GetPrepared: Boolean;
@@ -74,7 +74,7 @@ procedure TImportEngine.Prepare;
 begin
   if CanPrepare then
   begin
-    FPrepared := FCSVSource.Prepare;
+    FPrepared := FSource.Prepare;
     if FPrepared then
       FPrepared := FDestination.Prepare;
   end;
@@ -101,7 +101,7 @@ procedure TImportEngine.SetSource(const ASource: TCSVSourceFile);
 begin
   if ASource = Nil then
     raise ENullPointerException.Create(ENullPointerException.NULL_POINTER_EXCEPTION_MESSAGE);
-  FCSVSource := ASource;
+  FSource := ASource;
 end;
 
 function TImportEngine.WithFileDefinition(const AValidator: IFileDefinition): IImportEngine;
